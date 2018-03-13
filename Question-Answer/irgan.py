@@ -177,9 +177,9 @@ def main():
 			with sess.as_default() ,open(log_precision,"w") as log,open(loss_precision,"w") as loss_log :
 
 				DIS_MODEL_FILE="model/pre-trained.model"   # overfitted DNS
-				param = pickle.load(open(DIS_MODEL_FILE,"rb"))
+				# param = pickle.load(open(DIS_MODEL_FILE,"rb"))
 		
-				# param= None
+				param= None # 不加载参数
 				loss_type="pair"
 				discriminator = Discriminator.Discriminator(
 						sequence_length=FLAGS.max_sequence_length,
@@ -248,7 +248,9 @@ def main():
 							for batch in insurance_qa_data_helpers.batch_iter(samples,batch_size=FLAGS.batch_size):							
 								feed_dict = {generator.input_x_1: batch[:,0],generator.input_x_2: batch[:,1],generator.input_x_3: batch[:,2]}
 								
-								predicted=sess.run(generator.gan_score,feed_dict)
+								# 生成预测 # cosine(q,neg) - cosine(q,pos) 正常应该是负数
+								# 在QA中是排名cosine取最高的作为正确的
+								predicted=sess.run(generator.gan_score,feed_dict) 
 								predicteds.extend(predicted)														 
 							
 							exp_rating = np.exp(np.array(predicteds)*FLAGS.sampled_temperature)

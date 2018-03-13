@@ -20,10 +20,10 @@ class Generator(QACNN):
         self.global_step = tf.Variable(0, name="global_step", trainable=False)
         optimizer = tf.train.AdamOptimizer(self.learning_rate)
         grads_and_vars = optimizer.compute_gradients(self.gan_loss)
-        self.gan_updates = optimizer.apply_gradients(grads_and_vars, global_step=self.global_step)
-
+        self.gan_updates = optimizer.apply_gradients(grads_and_vars, global_step=self.global_step)      
+        
         # minize attention
-        self.gan_score=self.score13-self.score12
+        self.gan_score=self.score13-self.score12  # cosine(q,neg) - cosine(q,pos)
         self.dns_score=self.score13
       
 

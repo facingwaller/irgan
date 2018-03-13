@@ -19,8 +19,8 @@ class Discriminator(QACNN):
             self.loss = tf.reduce_sum(self.losses) + self.l2_reg_lambda * self.l2_loss
             
             self.reward = 2.0*(tf.sigmoid(tf.sub(0.05, tf.sub(self.score12, self.score13))) -0.5) # no log
-            self.positive= tf.reduce_mean(self.score12)
-            self.negative= tf.reduce_mean( self.score13)
+            self.positive= tf.reduce_mean(self.score12)  # cosine(q,pos)
+            self.negative= tf.reduce_mean( self.score13)  # cosine(q,neg)
 
             self.correct = tf.equal(0.0, self.losses)
             self.accuracy = tf.reduce_mean(tf.cast(self.correct, "float"), name="accuracy")
