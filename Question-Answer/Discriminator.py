@@ -14,7 +14,7 @@ class Discriminator(QACNN):
 
     
         with tf.name_scope("output"):
-
+            # 这个是普通的loss函数：  max( 0,0.05 -(pos-neg) )
             self.losses = tf.maximum(0.0, tf.subtract(0.05, tf.subtract(self.score12, self.score13)))
             self.loss = tf.reduce_sum(self.losses) + self.l2_reg_lambda * self.l2_loss
             

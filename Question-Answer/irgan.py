@@ -119,6 +119,9 @@ def dev_step(sess, cnn, testList, dev_size=100):
     if dev_size > len(testList) / 500:
         dev_size = len(testList) / 500
         print("have test %d samples" % dev_size)
+
+    print(dev_size)
+    dev_size =int(dev_size)
     for i in range(dev_size):
         batch_scores = []
         for j in range(int(500 / FLAGS.batch_size)):
@@ -147,6 +150,7 @@ def dev_step(sess, cnn, testList, dev_size=100):
             scoreList.append(1)
         else:
             scoreList.append(0)
+        # ZeroDivisionError: float division by zero
     return sum(scoreList) * 1.0 / len(scoreList)
 
 
@@ -262,17 +266,17 @@ def main():
 
                             exp_rating = np.exp(np.array(predicteds) * FLAGS.sampled_temperature)
                             prob = exp_rating / np.sum(exp_rating)
-
+                            # 回归后根据对应位置的概率，随机选择出一定的neg。 https://www.zhihu.com/question/23765351
                             neg_index = np.random.choice(np.arange(len(pools)), size=FLAGS.gan_k, p=prob,
                                                          replace=False)  # 生成 FLAGS.gan_k个负例
-
+                            # 取出这些负样本就拿去给D判别 score12 = q_pos   score13 = q_neg
                             subsamples = np.array(
                                 insurance_qa_data_helpers.loadCandidateSamples(q, a, pools[neg_index], vocab))
                             feed_dict = {discriminator.input_x_1: subsamples[:, 0],
                                          discriminator.input_x_2: subsamples[:, 1],
                                          discriminator.input_x_3: subsamples[:, 2]}
                             reward = sess.run(discriminator.reward,
-                                              feed_dict)  # reward= 2 * (tf.sigmoid( score_13 ) - 0.5)
+                                              feed_dict)  # reward= 2 * (tf.sigmoid( 0.05- (q_pos -q_neg) ) - 0.5)
 
                             samples = np.array(samples)
                             feed_dict = {
